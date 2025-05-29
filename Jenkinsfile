@@ -3,7 +3,7 @@ pipeline {
 
     tools {
         maven 'maven' // Usa o Maven que você configurou no Jenkins (Global Tool Configuration)
-        jdk 'jdk-11'  // Usa o JDK que você configurou (opcional se já tiver no sistema)
+        jdk 'jdk-17'  // Usa o JDK que você configurou (opcional se já tiver no sistema)
     }
 
     environment {
