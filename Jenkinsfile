@@ -2,8 +2,11 @@ pipeline {
     agent any
 
     environment {
-        // Nome da credencial do Azure no Jenkins (do tipo "Secret text", JSON do SP)
+        // Credencial JSON do Azure Service Principal (tipo "Secret text")
         AZURE_AUTH = credentials('azure-sp')
+
+        // Token do SonarQube (tipo "Secret text")
+        SONAR_TOKEN = credentials('sonar-token')
 
         // Informações do App Service
         RESOURCE_GROUP = 'gs-cicd'
@@ -14,7 +17,6 @@ pipeline {
 
         stage('Clonar repositório') {
             steps {
-                // Garante que o Jenkins busque o branch principal
                 checkout([$class: 'GitSCM',
                     branches: [[name: '*/main']],
                     userRemoteConfigs: [[
@@ -32,6 +34,20 @@ pipeline {
                     } else {
                         echo "✅ docker-compose.yml encontrado"
                     }
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube_Local') {
+                    sh """
+                        sonar-scanner \
+                        -Dsonar.projectKey=usuarios-service \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://localhost:9090 \
+                        -Dsonar.login=${SONAR_TOKEN}
+                    """
                 }
             }
         }
