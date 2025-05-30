@@ -41,7 +41,7 @@ pipeline {
                 withSonarQubeEnv('SonarQube_Local') {
                     sh '''
                         /opt/sonar-scanner/bin/sonar-scanner \
-                          -Dsonar.projectKey=meu_projeto \
+                          -Dsonar.projectKey=gs-cicd \
                           -Dsonar.sources=. \
                           -Dsonar.host.url=http://localhost:9000 \
                           -Dsonar.login=$SONAR_TOKEN
