@@ -2,18 +2,25 @@ pipeline {
     agent any
 
     environment {
-        // Nome da credencial do Azure no Jenkins
+        // Nome da credencial do Azure no Jenkins (do tipo "Secret text", JSON do SP)
         AZURE_AUTH = credentials('azure-sp')
 
-        // Variáveis do Azure
+        // Informações do App Service
         RESOURCE_GROUP = 'gs-cicd'
         APP_SERVICE_NAME = 'cicd'
     }
 
     stages {
+
         stage('Clonar repositório') {
             steps {
-                git url: 'https://github.com/renanAfs/GS-CICD.git'
+                // Garante que o Jenkins busque o branch principal
+                checkout([$class: 'GitSCM',
+                    branches: [[name: '*/main']],
+                    userRemoteConfigs: [[
+                        url: 'https://github.com/renanAfs/GS-CICD.git'
+                    ]]
+                ])
             }
         }
 
@@ -21,7 +28,9 @@ pipeline {
             steps {
                 script {
                     if (!fileExists('docker-compose.yml')) {
-                        error "Arquivo docker-compose.yml não encontrado no repositório!"
+                        error "❌ Arquivo docker-compose.yml não encontrado no repositório!"
+                    } else {
+                        echo "✅ docker-compose.yml encontrado"
                     }
                 }
             }
@@ -32,6 +41,7 @@ pipeline {
                 writeFile file: 'azureauth.json', text: AZURE_AUTH
 
                 sh '''
+                    echo "🔐 Realizando login no Azure..."
                     az logout || true
 
                     az login --service-principal \
@@ -40,6 +50,7 @@ pipeline {
                         --tenant $(jq -r .tenantId azureauth.json)
 
                     az account set --subscription $(jq -r .subscriptionId azureauth.json)
+                    echo "✅ Login no Azure realizado com sucesso"
                 '''
             }
         }
@@ -47,22 +58,6 @@ pipeline {
         stage('Deploy no Azure App Service (Docker Compose)') {
             steps {
                 sh '''
+                    echo "🚀 Iniciando deploy no App Service..."
                     az webapp config container set \
-                      --resource-group $RESOURCE_GROUP \
-                      --name $APP_SERVICE_NAME \
-                      --multicontainer-config-type compose \
-                      --multicontainer-config-file docker-compose.yml
-                '''
-            }
-        }
-    }
-
-    post {
-        success {
-            echo '✅ Deploy realizado com sucesso no Azure!'
-        }
-        failure {
-            echo '❌ Falha no deploy. Verifique os logs para detalhes.'
-        }
-    }
-}
+                        --resource-g
