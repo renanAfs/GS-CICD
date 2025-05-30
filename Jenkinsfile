@@ -2,10 +2,8 @@ pipeline {
     agent any
 
     environment {
-        // Credencial JSON do Azure Service Principal (tipo "Secret text")
+        // Nome da credencial do Azure no Jenkins (do tipo "Secret text", JSON do SP)
         AZURE_AUTH = credentials('azure-sp')
-
-        // Token do SonarQube (tipo "Secret text")
         SONAR_TOKEN = credentials('sonar-token')
 
         // Informações do App Service
@@ -38,16 +36,16 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Análise SonarQube') {
             steps {
                 withSonarQubeEnv('SonarQube_Local') {
-                    sh """
+                    sh '''
                         sonar-scanner \
-                        -Dsonar.projectKey=usuarios-service \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=http://localhost:9090 \
-                        -Dsonar.login=${SONAR_TOKEN}
-                    """
+                          -Dsonar.projectKey=meu_projeto \
+                          -Dsonar.sources=. \
+                          -Dsonar.host.url=http://localhost:9000 \
+                          -Dsonar.login=$SONAR_TOKEN
+                    '''
                 }
             }
         }
