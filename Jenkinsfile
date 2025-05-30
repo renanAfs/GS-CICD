@@ -46,7 +46,7 @@ pipeline {
                         -Dsonar.projectKey=usuarios-service \
                         -Dsonar.sources=. \
                         -Dsonar.host.url=http://localhost:9090 \
-                        -Dsonar.login=${2}
+                        -Dsonar.login=${SONAR_TOKEN}
                     """
                 }
             }
