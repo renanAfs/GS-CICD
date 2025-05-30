@@ -38,19 +38,6 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv('SonarQube_Local') {
-                    sh """
-                        sonar-scanner \
-                        -Dsonar.projectKey=usuarios-service \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=http://localhost:9090 \
-                        -Dsonar.login=${SONAR_TOKEN}
-                    """
-                }
-            }
-        }
 
         stage('Login no Azure') {
             steps {
@@ -86,6 +73,20 @@ pipeline {
             }
         }
     }
+
+     stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube_Local') {
+                    sh """
+                        sonar-scanner \
+                        -Dsonar.projectKey=usuarios-service \
+                        -Dsonar.sources=. \
+                        -Dsonar.host.url=http://localhost:9090 \
+                        -Dsonar.login=${SONAR_TOKEN}
+                    """
+                }
+            }
+        }
 
     post {
         success {
