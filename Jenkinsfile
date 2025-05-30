@@ -2,11 +2,11 @@ pipeline {
     agent any
 
     environment {
-        // Nome da credencial do Azure no Jenkins (do tipo "Secret text", JSON do SP)
-        AZURE_AUTH = credentials('azure-sp')
-        SONAR_TOKEN = credentials('sonar-token')
+        // Credenciais
+        AZURE_AUTH = credentials('azure-sp')        // JSON do Azure SP
+        SONAR_TOKEN = credentials('sonar-token')     // Token do SonarQube
 
-        // Informações do App Service
+        // Azure
         RESOURCE_GROUP = 'gs-cicd'
         APP_SERVICE_NAME = 'cicd'
     }
@@ -40,7 +40,7 @@ pipeline {
             steps {
                 withSonarQubeEnv('SonarQube_Local') {
                     sh '''
-                        sonar-scanner \
+                        /opt/sonar-scanner/bin/sonar-scanner \
                           -Dsonar.projectKey=meu_projeto \
                           -Dsonar.sources=. \
                           -Dsonar.host.url=http://localhost:9000 \
