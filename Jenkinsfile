@@ -60,4 +60,23 @@ pipeline {
                 sh '''
                     echo "🚀 Iniciando deploy no App Service..."
                     az webapp config container set \
-                        --resource-g
+                        --resource-group $RESOURCE_GROUP \
+                        --name $APP_SERVICE_NAME \
+                        --multicontainer-config-type compose \
+                        --multicontainer-config-file docker-compose.yml
+
+                    echo "✅ Deploy aplicado com sucesso"
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '🎉 Pipeline finalizado com sucesso! Aplicação implantada no Azure App Service.'
+        }
+        failure {
+            echo '❌ Ocorreu uma falha no pipeline. Verifique os logs acima.'
+        }
+    }
+}
