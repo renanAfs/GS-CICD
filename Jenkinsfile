@@ -6,14 +6,14 @@ pipeline {
         AZURE_AUTH = credentials('azure-sp')
 
         // Variáveis do Azure
-        RESOURCE_GROUP = 'meu-resource-group'
-        APP_SERVICE_NAME = 'meuapp-compose'
+        RESOURCE_GROUP = 'gs-cicd'
+        APP_SERVICE_NAME = 'cicd'
     }
 
     stages {
         stage('Clonar repositório') {
             steps {
-                git url: 'https://github.com/seuusuario/seurepo.git'
+                git url: 'https://github.com/renanAfs/GS-CICD.git'
             }
         }
 
